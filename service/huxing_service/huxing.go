@@ -8,7 +8,7 @@ import (
 )
 
 //查找户型
-func gethuxing(id uint) (*model.Huxing, error) {
+func Gethuxing(id uint) (*model.Huxing, error) {
 	var t model.Huxing
 	huxing, err := t.FindHuxingByID(id)
 	if err != nil {
@@ -43,7 +43,7 @@ func DeleteHuxing(Id uint) error {
 	huxing := model.Huxing{
 		Model: model.Model{ID: Id},
 	}
-	if _, err := gethuxing(Id); err != nil {
+	if _, err := Gethuxing(Id); err != nil {
 		return err
 	}
 	if err := huxing.DeletedHuxing(); err != nil {
@@ -64,7 +64,7 @@ func UpdateHuxing(area string, areaShow string, buildingNo string, huxingNo stri
 		Quantity:   quantity,
 		Rounds:     rounds,
 	}
-	if _, err := gethuxing(id); err != nil {
+	if _, err := Gethuxing(id); err != nil {
 		return err
 	}
 	if err := huxing.UpdateHuxing(); err != nil {

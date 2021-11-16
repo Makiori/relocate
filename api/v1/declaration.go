@@ -325,23 +325,23 @@ func GetDeclarationByContractNo(c *gin.Context) {
 	appG.SuccessResponse(DeclarationList)
 }
 
-/*func ExportDeclaration(c *gin.Context) {
+func ExportDeclaration(c *gin.Context) {
 	appG := app.Gin{Ctx: c}
 	var body api.DeclarationFilterBody
 	if !appG.ParseQueryRequest(&body) {
 		return
 	}
 	body.PageSize = 9999
-	data, err := model.GetLikeResults(body)
+	data, err := model.GetLikeDeclaration(body)
 	if appG.HasError(err) {
 		return
 	}
-	resultDataList, ok := data.Data.(*[]model.ResultData)
+	DeclarationDataList, ok := data.Data.(*[]model.DeclarationData)
 	if !ok {
 		appG.BadResponse("导出过程发生异常")
 		return
 	}
-	file, filename, err := result_service.ExportExcel(*resultDataList)
+	file, filename, err := declaration_service.ExportExcel(*DeclarationDataList)
 	if appG.HasError(err) {
 		return
 	}
@@ -355,4 +355,4 @@ func GetDeclarationByContractNo(c *gin.Context) {
 	if appG.HasError(file.Write(c.Writer)) {
 		return
 	}
-}*/
+}

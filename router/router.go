@@ -162,7 +162,7 @@ func initDeclarationRouter(apiV1 *gin.RouterGroup) {
 		declaration.POST("/updateDeclaration", v1.UpdateDeclaration)
 		declaration.POST("/updateActive", middleware.JWT(sign.AdminClaimsType), v1.UpdateDeclarationActive)
 		declaration.GET("/getDetail", v1.GetDeclarationDetail)
-		//declaration.POST("/export",middleware.JWT(sign.AdminClaimsType),v1.ExportDeclaration)
+		declaration.GET("/export", v1.ExportDeclaration)
 	}
 }
 
@@ -203,7 +203,7 @@ func initCheckRouter(apiV1 *gin.RouterGroup) {
 	check := apiV1.Group("/check")
 	{
 		check.GET("", middleware.JWT(sign.AdminClaimsType), v1.GetCheckList)
-		check.POST("", middleware.JWT(sign.AdminClaimsType), v1.AddCheck)
+		check.POST("", middleware.JWT(sign.AdminClaimsType), middleware.Visitors(true), v1.AddCheck)
 		check.GET("/export", middleware.JWT(sign.AdminClaimsType), v1.ExportCheck)
 
 	}

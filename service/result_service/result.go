@@ -73,6 +73,17 @@ func getDeclartionID(id []int) (*model.Result, error) {
 	return result, nil
 }
 
+func GetResultByID(id uint) (*model.Result, error) {
+	result, err := model.FindResultByID(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, errors.BadError("结果不存在")
+		}
+		return nil, err
+	}
+	return result, nil
+}
+
 func UpdatePublicityStat(declarationID []int, publicityStatus bool) error {
 	if _, err := getDeclartionID(declarationID); err != nil {
 		return err

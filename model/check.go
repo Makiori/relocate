@@ -75,3 +75,9 @@ func GetLikeCheck(checkFilterBody api.CheckFilterBody) (data *PaginationQ, err e
 	}
 	return
 }
+
+func FindCheckByContractNo(contractNo string) (*Check, error) {
+	var c Check
+	err := db.Model(&Check{}).Where("contract_no = ?", contractNo).Take(&c).Error
+	return &c, err
+}

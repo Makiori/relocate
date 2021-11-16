@@ -7,6 +7,7 @@ import (
 	"relocate/api"
 	"relocate/model"
 	"relocate/util/errors"
+	"relocate/util/random"
 	"relocate/util/times"
 	"strconv"
 	"strings"
@@ -966,4 +967,79 @@ func UpdateDeclarationActive(declarationID uint, statu bool) error {
 		return errors.BadError("修改申报有效状态失败")
 	}
 	return nil
+}
+
+func ExportExcel(declarationDataList []model.DeclarationData) (*excelize.File, string, error) {
+	file := excelize.NewFile()
+	sheet := "Sheet1"
+	file.SetCellStr(sheet, "A1", "序号")
+	file.SetSheetRow(sheet, "B1", &[]interface{}{
+		"申报表ID",
+		"时段ID",
+		"时段表述",
+		"合同号",
+		"分期期数ID",
+		"分期期数名称",
+		"轮数",
+		"申报面积㎡",
+		"申报户型ID",
+		"申报户型的户型",
+		"申报户型的栋号",
+		"申报面积描述",
+		"有效状态",
+		"中签状态",
+		"申报状态",
+		"被拆迁人",
+		"被拆迁房屋地址",
+		"被拆迁人身份证号码",
+
+		"房屋栋号",
+		"手机号码1",
+		"手机号码2",
+		"受托人",
+		"受托人身份证号码",
+		"受托人手机号码",
+		"受托人关系",
+		"社别",
+	})
+	for i, declarationData := range declarationDataList {
+		file.SetCellInt(sheet, fmt.Sprintf("A%d", i+2), i+1)
+		file.SetSheetRow(sheet, fmt.Sprintf("B%d", i+2), &[]interface{}{
+			declarationData.ID,
+			declarationData.TimeID,
+			declarationData.TimeName,
+			declarationData.ContractNo,
+			declarationData.StagingID,
+			declarationData.StagingName,
+			declarationData.Rounds,
+			declarationData.DeclarationArea,
+			declarationData.DeclarationHuxingID,
+			declarationData.DeclarationHuxingNo,
+			declarationData.DeclarationBuildingNo,
+			declarationData.DeclarationAreaShow,
+			declarationData.ActiveState,
+			declarationData.WinningStatus,
+			declarationData.DeclarationStatus,
+
+			declarationData.Peoples,
+			declarationData.OldAddress,
+			declarationData.CardNumber,
+
+			declarationData.HouseNumber,
+			declarationData.PhoneNumber1,
+			declarationData.PhoneNumber2,
+			declarationData.Trustee,
+			declarationData.TrusteeCardNumber,
+			declarationData.TrusteePhoneNumber,
+			declarationData.TrusteeRelationship,
+			declarationData.SocialCategory,
+		})
+	}
+	fileName := fmt.Sprintf("申报表-%s-%s.xlsx", times.ToStr(), random.String(6))
+	//path := fmt.Sprintf("./excel/export/%s", fileName)
+	//err := file.SaveAs(path)
+	//if err != nil {
+	//	return nil, "", err
+	//}
+	return file, fileName, nil
 }

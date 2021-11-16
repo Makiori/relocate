@@ -1,6 +1,7 @@
 package model
 
 import (
+	"relocate/api"
 	"relocate/util/errors"
 	"relocate/util/logging"
 
@@ -220,7 +221,7 @@ func GetActiveStateDeclaration(contractNo string, stagingID, rounds uint) (data 
 
 func FindDeclarationByID(declarationID uint) (declaration *Declaration, err error) {
 	declaration = new(Declaration)
-	err = db.Model(&Declaration{}).Where("id = ?", declarationID).First(&declaration).Error
+	err = db.Model(&Declaration{}).Where("id = ?", declarationID).Find(&declaration).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, errors.BadError("该申报不存在")
@@ -313,6 +314,38 @@ func (d *Declaration) FindDeclartionByStagingId(stagingid uint) (*Declaration, e
 		return nil, err
 	}
 	return d, nil
+}
+
+func GetLikeDeclaration(declarationFilterBody api.DeclarationFilterBody) (data *PaginationQ, err error) {
+	q := &PaginationQ{
+		PageSize: declarationFilterBody.PageSize,
+		Page:     declarationFilterBody.Page,
+		Data:     &[]DeclarationData{},
+	}
+	status := make([]bool, 0)
+	if declarationFilterBody.DeclarationStatus == -1 {
+		status = append(status, true)
+		status = append(status, false)
+	} else if declarationFilterBody.DeclarationStatus == 0 {
+		status = append(status, true)
+	} else {
+		status = append(status, false)
+	}
+
+	if declarationFilterBody.HuxingId == 0 {
+		return q.SearchAll(
+			db.Table("declaration d").
+				Select("d.*, c.peoples , c.old_address, c.card_number, c.house_number, c.phone_number1, c.phone_number2").Joins("join contract c on c.contract_no = d.contract_no").
+				Where("d.staging_id = ? AND d.declaration_status IN (?) AND d.deleted_at is null", declarationFilterBody.StagingId, status).Order("d.declaration_huxing_no"),
+		)
+	} else {
+		return q.SearchAll(
+			db.Table("declaration d").
+				Select("d.*, c.peoples , c.old_address, c.card_number, c.house_number, c.phone_number1, c.phone_number2").Joins("join contract c on c.contract_no = d.contract_no").
+				Where("d.staging_id = ? AND d.declaration_huxing_id = ? AND d.declaration_status IN (?) AND d.deleted_at is null", declarationFilterBody.StagingId, declarationFilterBody.HuxingId, status).Order("d.declaration_huxing_no"),
+		)
+	}
+
 }
 
 func EnterResult(declarationid uint, buildingno string, roomno string, status int) error {
